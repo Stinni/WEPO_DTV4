@@ -2,79 +2,38 @@
 // Login: kristinnf13
 // Kt: 011081-3209
 
-describe("LoginController", function() {
+describe("LoginController end to end tests", function() {
 
 /*
  * What happens when the user enters a valid username/password combination
  * (example: smu/smu) (Expected outcome: the browser navigates to the /about url)
- *
+ */
+	var usr = "smu";
+
+	beforeEach(function() {
+		browser.get("http://localhost:8089/src/#/");
+	});
+
+	it("should log in and navigate to the /about url", function() {
+
+		element(by.model("username")).sendKeys(usr);
+		element(by.model("password")).sendKeys(usr);
+		element(by.id("loginBtn")).click();
+
+		expect(browser.getLocationAbsUrl()).toBe("/about");
+	});
+
+/*
  * What happens when the user enters an invalid username/password combination (example: smu/barf)
  * (Expected outcome: the browser stays on the same url, and an error message is displayed).
 */
+	it("should log in and navigate to the /about url", function() {
 
-	var theController, scope;
-	var mockResourceTrue = {
-		isValidUserAndPass: function(user, pass) {
-			return true;
-		}
-	};
-	var mockResourceFalse = {
-		isValidUserAndPass: function(user,pass) {
-			return false;
-		}
-	};
-	var mockLocation = {
-		path: function(p) {
-		}
-	};
+		element(by.model("username")).sendKeys(usr);
+		element(by.model("password")).sendKeys("barf");
+		element(by.id("loginBtn")).click();
 
-	beforeEach(module("testApp"));
-
-	describe("when login resource returns true", function() {
-		beforeEach(inject(function($rootScope, $controller) {
-			scope = $rootScope.$new();
-			spyOn(mockLocation, "path");
-			theController = $controller("LoginController", {
-				$scope: scope,
-				LoginResource: mockResourceTrue,
-				$location: mockLocation
-			});
-		}));
-
-		it("should have the onLogin function", function() {
-			expect(scope.onLogin).toBeDefined();
-		});
-
-		it("should change the path to /about", function() {
-			scope.onLogin();
-			expect(mockLocation.path).toHaveBeenCalledWith("/about");
-		});
-
-		it("should NOT have set the errorMessage", function() {
-			scope.onLogin();
-			expect(scope.errorMessage).not.toEqual("Login failed!");
-		});
-	});
-
-	describe("when login resource returns false", function() {
-		beforeEach(inject(function($rootScope, $controller) {
-			scope = $rootScope.$new();
-			spyOn(mockLocation, "path");
-			theController = $controller("LoginController", {
-				$scope: scope,
-				LoginResource: mockResourceFalse,
-				$location: mockLocation
-			});
-		}));
-
-		it("should have set the errorMessage", function() {
-			scope.onLogin();
-			expect(scope.errorMessage).toEqual("Login failed!");
-		});
-
-		it("should NOT change the path to /about", function() {
-			scope.onLogin();
-			expect(mockLocation.path).not.toHaveBeenCalledWith("/about");
-		});
+		expect(browser.getLocationAbsUrl()).not.toBe("/about");
+		expect(element(by.binding("errorMessage")).getText()).toBe("Login failed!");
 	});
 });

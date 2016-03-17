@@ -7,5 +7,7 @@ angular.module("testApp", ["ngRoute"])
 		templateUrl: "login/login.html"
 	}).when("/about", {
 		templateUrl: "about/about.html"
-	});
+	}).otherwise({
+		redirectTo: "/"
+	});;
 });
